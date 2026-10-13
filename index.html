@@ -547,6 +547,39 @@ loadData();renderSiteReport();
 renderGuards();
 renderAttendance();
 updateDashboard();initMonthlyCalendar();
+const loginScreen = document.getElementById("loginScreen");
+const loginForm = document.getElementById("loginForm");
+const loginMessage = document.getElementById("loginMessage");
+
+async function checkLogin() {
+  const { data, error } = await supabaseClient.auth.getSession();
+
+  if (error || !data.session) {
+    loginScreen.style.display = "flex";
+  } else {
+    loginScreen.style.display = "none";
+  }
+}
+
+loginForm.addEventListener("submit", async function(event) {
+  event.preventDefault();
+  loginMessage.textContent = "Signing in...";
+
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email: document.getElementById("loginEmail").value,
+    password: document.getElementById("loginPassword").value
+  });
+
+  if (error) {
+    loginMessage.textContent = "Sign-in failed. Check your email and password.";
+    return;
+  }
+
+  loginMessage.textContent = "";
+  loginScreen.style.display = "none";
+});
+
+checkLogin();
 </script>
 
 </body>
