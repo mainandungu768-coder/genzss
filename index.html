@@ -231,6 +231,100 @@ function loadData() {
     attendance = [];
   }
 }
+ async function syncGuardsWithCloud() {
+  const { data: sessionData, error: sessionError } =
+    await supabaseClient.auth.getSession();
+
+  if (sessionError || !sessionData.session) {
+    return;
+  }
+
+  // Give each local guard a permanent ID
+  guards.forEach(function(guard) {
+    if (!guard.client_id) {
+      guard.client_id =
+        "guard-" + Date.now() + "-" +
+        Math.random().toString(36).slice(2, 10);
+    }
+  });
+
+  saveData();
+
+  // Read the guards already in the cloud
+  const { data: cloudGuards, error } =
+    await supabaseClient
+      .from("guards")
+      .select("id,name,phone,guard_code,site,photo,client_id");
+
+  if (error) {
+    alert("Could not load cloud guards: " + error.message);
+    return;
+  }
+
+  const existingIds = new Set(
+    cloudGuards.map(function(guard) {
+      return guard.client_id;
+    }).filter(Boolean)
+  );
+
+  // Upload only local guards not already in the cloud
+  const missingGuards = guards
+    .filter(function(guard) {
+      return !existingIds.has(guard.client_id);
+    })
+    .map(function(guard) {
+      return {
+        name: guard.name,
+        phone: guard.phone || "",
+        guard_code: guard.id || "",
+        site: guard.site || "",
+        photo: guard.photo || "",
+        client_id: guard.client_id
+      };
+    });
+
+  if (missingGuards.length > 0) {
+    const { error: uploadError } =
+      await supabaseClient
+        .from("guards")
+        .insert(missingGuards);
+
+    if (uploadError) {
+      alert("Cloud upload error: " + uploadError.message);
+      return;
+    }
+  }
+
+  // Read the latest cloud records
+  const { data: latestGuards, error: reloadError } =
+    await supabaseClient
+      .from("guards")
+      .select("id,name,phone,guard_code,site,photo,client_id");
+
+  if (reloadError) {
+    alert("Could not refresh guards: " + reloadError.message);
+    return;
+  }
+
+  // Convert cloud records into the app's guard format
+  guards = latestGuards.map(function(guard) {
+    return {
+      name: guard.name,
+      phone: guard.phone || "",
+      id: guard.guard_code || "",
+      site: guard.site || "",
+      photo: guard.photo || "",
+      client_id: guard.client_id
+    };
+  });
+
+  saveData();
+  renderGuards();
+  updateDashboard();
+  renderSiteReport();
+
+  alert("Guard cloud sync completed!");
+} 
 
 function showPage(page) {
   document.getElementById("dashboard").hidden = page !== "dashboard";
@@ -597,10 +691,10 @@ async function checkLogin() {
 
   if (error || !data.session) {
     loginScreen.style.display = "flex";
-  } else {
+ } else {
     loginScreen.style.display = "none";
+    await syncGuardsWithCloud();
   }
-}
 
 loginForm.addEventListener("submit", async function(event) {
   event.preventDefault();
@@ -618,6 +712,7 @@ loginForm.addEventListener("submit", async function(event) {
 
   loginMessage.textContent = "";
   loginScreen.style.display = "none";
+await syncGuardsWithCloud();
 });
 
 checkLogin();
