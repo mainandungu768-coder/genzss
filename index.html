@@ -694,8 +694,8 @@ async function checkLogin() {
  } else {
     loginScreen.style.display = "none";
     await syncGuardsWithCloud();
+    }
   }
-
 loginForm.addEventListener("submit", async function(event) {
   event.preventDefault();
   loginMessage.textContent = "Signing in...";
