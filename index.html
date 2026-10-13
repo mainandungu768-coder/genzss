@@ -189,7 +189,7 @@ function saveData() {
   localStorage.setItem("pamagiGuards", JSON.stringify(guards));
   localStorage.setItem("pamagiAttendance", JSON.stringify(attendance));
 }
-  async function saveGuardsToCloud() {
+  {
   const { data: sessionData } =
     await supabaseClient.auth.getSession();
 
