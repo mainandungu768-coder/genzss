@@ -189,37 +189,7 @@ function saveData() {
   localStorage.setItem("pamagiGuards", JSON.stringify(guards));
   localStorage.setItem("pamagiAttendance", JSON.stringify(attendance));
 }
-  {
-  const { data: sessionData } =
-    await supabaseClient.auth.getSession();
-
-  if (!sessionData.session) {
-    
-    return;
-  }
-
-  const cloudGuards = guards.map(function(guard) {
-    return {
-      name: guard.name,
-      phone: guard.phone || "",
-      guard_code: guard.id || "",
-      site: guard.site || "",
-      photo: guard.photo || ""
-    };
-  });
-
-  const { error } = await supabaseClient
-    .from("guards")
-    .insert(cloudGuards);
-
-  if (error) {
-    alert("Cloud save error: " + error.message);
-    return;
-  }
-
-  alert("Guards saved to the cloud!");
-}
-
+ 
 function loadData() {
   try {
     guards = JSON.parse(localStorage.getItem("pamagiGuards")) || [];
