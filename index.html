@@ -510,6 +510,9 @@ async function finishRegistration() {
   guard.photo = photoPath;
   guards.push(guard);
   saveData();
+  
+  await syncGuardsWithCloud();
+  
   renderGuards();
   updateDashboard();
   renderSiteReport();
