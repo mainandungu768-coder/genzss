@@ -324,12 +324,23 @@ guards.forEach(function(guard, index) {
 
 if (guard.photo) {
   const img = document.createElement("img");
-  img.src = guard.photo;
   img.alt = guard.name;
   img.style.width = "50px";
   img.style.height = "50px";
   img.style.objectFit = "cover";
-  photoCell.appendChild(img);
+
+  supabaseClient.storage
+    .from("guard-photos")
+    .createSignedUrl(guard.photo, 3600)
+    .then(function(result) {
+      if (result.error) {
+        photoCell.textContent = "Photo unavailable";
+        return;
+      }
+
+      img.src = result.data.signedUrl;
+      photoCell.appendChild(img);
+    });
 } else {
   photoCell.textContent = "No photo";
 }
@@ -572,18 +583,26 @@ function renderMonthlyCalendar() {
   calendar.innerHTML = "";var selectedGuard = guards.find(function(item) {
   return item.name === guard;
 });
-
 if (selectedGuard && selectedGuard.photo) {
   var photo = document.createElement("img");
-  photo.src = selectedGuard.photo;
   photo.alt = guard;
   photo.style.width = "80px";
   photo.style.height = "80px";
   photo.style.objectFit = "cover";
   photo.style.display = "block";
   photo.style.marginBottom = "10px";
-  calendar.appendChild(photo);
-}  summary.textContent = "";
+
+  supabaseClient.storage
+    .from("guard-photos")
+    .createSignedUrl(selectedGuard.photo, 3600)
+    .then(function(result) {
+      if (!result.error) {
+        photo.src = result.data.signedUrl;
+        calendar.prepend(photo);
+      }
+    });
+}
+ summary.textContent = "";
 
   if (!guard || !month) {
     calendar.textContent = "Choose a guard and month first.";
