@@ -420,7 +420,9 @@ editButton.onclick = function() {
   alert("Guard details updated successfully!");
 };
 
-actionCell.appendChild(editButton); editButton.style.display = "inline-block";   deleteButton.onclick = function() {
+actionCell.appendChild(editButton);
+  editButton.style.display = "inline-block";
+  deleteButton.onclick = function() {
       if (confirm("Delete this guard?")) {
         guards.splice(index, 1);
         saveData();
@@ -430,7 +432,8 @@ renderSiteReport();        renderAttendance();
       }
     };
 
-    actionCell.appendChild(deleteButton);deleteButton.style.display = "inline-block";
+    actionCell.appendChild(deleteButton);
+  deleteButton.style.display = "inline-block";
     row.appendChild(actionCell);
     list.appendChild(row);
 
@@ -439,7 +442,8 @@ renderSiteReport();        renderAttendance();
     option.textContent = guard.name + " - " + guard.site;
     selector.appendChild(option);
   });
-}function renderSiteReport() {
+}
+  function renderSiteReport() {
   const report = document.getElementById("siteReport");
   const siteCounts = {};
 
