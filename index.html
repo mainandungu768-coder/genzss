@@ -395,7 +395,7 @@ editButton.onclick = function() {
   alert("Guard details updated successfully!");
 };
 
-actionCell.appendChild(editButton);    deleteButton.onclick = function() {
+actionCell.appendChild(editButton); editButton.style.display = "inline-block";   deleteButton.onclick = function() {
       if (confirm("Delete this guard?")) {
         guards.splice(index, 1);
         saveData();
@@ -405,7 +405,7 @@ renderSiteReport();        renderAttendance();
       }
     };
 
-    actionCell.appendChild(deleteButton);
+    actionCell.appendChild(deleteButton);deleteButton.style.display = "inline-block";
     row.appendChild(actionCell);
     list.appendChild(row);
 
