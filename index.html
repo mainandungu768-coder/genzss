@@ -457,29 +457,61 @@ photo: ""     };
     alert("Please fill in all fields.");
     return;
   }
+var photoFile = document.getElementById("guardPhoto").files[0];
 
- var photoFile = document.getElementById("guardPhoto").files[0];
+async function finishRegistration() {
+  let photoPath = "";
 
-function finishRegistration(photoData) {
-  guard.photo = photoData || "";
+  if (photoFile) {
+    const { data: userData, error: userError } =
+      await supabaseClient.auth.getUser();
+
+    if (userError || !userData.user) {
+      alert("Please sign in before uploading a photo.");
+      return;
+    }
+
+    const extension =
+      photoFile.name.split(".").pop().toLowerCase();
+
+    const filePath =
+      userData.user.id + "/" +
+      Date.now() + "-" +
+      Math.random().toString(36).slice(2, 8) +
+      "." + extension;
+
+    const { data: uploadedPhoto, error: uploadError } =
+      await supabaseClient.storage
+        .from("guard-photos")
+        .upload(filePath, photoFile, {
+          contentType: photoFile.type,
+          upsert: false
+        });
+
+    if (uploadError) {
+      alert("Photo upload failed: " + uploadError.message);
+      return;
+    }
+
+    photoPath = uploadedPhoto.path;
+  }
+
+  guard.photo = photoPath;
   guards.push(guard);
   saveData();
   renderGuards();
   updateDashboard();
   renderSiteReport();
   document.getElementById("guardForm").reset();
+
   alert("Guard registered successfully!");
 }
 
-if (photoFile) {
-  var reader = new FileReader();
-  reader.onload = function() {
-    finishRegistration(reader.result);
-  };
-  reader.readAsDataURL(photoFile);
-} else {
-  finishRegistration("");
-} 
+finishRegistration();
+
+
+}
+
 });
 
 document.getElementById("attendanceForm").addEventListener("submit", function(event) {
