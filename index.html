@@ -264,7 +264,8 @@ function loadData() {
       return;
     }
   }
-
+alert("Cloud guards found: " + cloudGuards.length);
+alert("New guards sent: " + missingGuards.length);
   // Read the latest cloud records
   const { data: latestGuards, error: reloadError } =
     await supabaseClient
