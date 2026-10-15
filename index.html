@@ -60,6 +60,31 @@ th, td {
   text-align: left;
 }
 th { background: #243447; color: white; }
+  
+#guardList td:last-child {
+  min-width: 130px;
+  white-space: nowrap;
+}
+
+#guardList td:last-child button {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin: 3px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+#guardList td:last-child button:first-child {
+  background: #243447;
+  color: white;
+}
+
+#guardList td:last-child button:last-child {
+  background: red;
+  color: white;
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script></head>
 <body>
