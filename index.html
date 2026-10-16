@@ -303,17 +303,25 @@ alert("New guards sent: " + missingGuards.length);
     return;
   }
 
-  // Convert cloud records into the app's guard format
+  // Preserve local photo paths if cloud records have no photo path
+  const localGuards = guards;
+
   guards = latestGuards.map(function(guard) {
+    const localGuard = localGuards.find(function(item) {
+      return item.client_id === guard.client_id;
+    });
+
     return {
       name: guard.name,
       phone: guard.phone || "",
       id: guard.guard_code || "",
       site: guard.site || "",
-      photo: guard.photo || "",
+      photo: guard.photo || (localGuard ? localGuard.photo : "") || "",
       client_id: guard.client_id
     };
   });
+
+
 
   saveData();
   renderGuards();
